@@ -1,0 +1,25 @@
+{
+  "name": "therapair-website",
+  "version": "1.0.0",
+  "description": "This folder contains everything needed to deploy the Therapair therapist matching tool to your website:",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/captuspario/therapair.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/captuspario/therapair/issues"
+  },
+  "homepage": "https://github.com/captuspario/therapair#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "playwright": "^1.56.0"
+  }
+}

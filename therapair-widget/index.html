@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Therapist Matching Widget</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
+            background-color: #F8F4FF;
+            padding: 0.5rem;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* Iframe widget optimizations */
+        html, body {
+            width: 100%;
+            height: auto;
+            overflow-x: hidden;
+        }
+
+        /* Widget-specific styles */
+        @media (max-width: 640px) {
+            body {
+                padding: 0.25rem;
+            }
+            .container {
+                padding: 0;
+            }
+        }
+
+        .container {
+            max-width: 72rem;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .chat-bubble {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .progress-dot {
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.active {
+            background-color: #9B74B7;
+            transform: scale(1.2);
+        }
+
+        .option-button {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            background-color: #9B74B7;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 20px;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            text-align: left;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .option-button:hover {
+            background-color: #4F064F;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(155, 116, 183, 0.25);
+        }
+
+        .option-button.selected {
+            background-color: #4F064F;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(155, 116, 183, 0.3);
+        }
+
+        .option-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .option-button:disabled.selected {
+            opacity: 1;
+            background-color: #4F064F;
+        }
+
+        /* Multiple choice styling */
+        .option-button.multiple-choice {
+            background-color: white;
+            color: #374151;
+            border: 2px solid #d1d5db;
+        }
+
+        .option-button.multiple-choice:hover {
+            background-color: #f9fafb;
+            border-color: #9B74B7;
+        }
+
+        .option-button.multiple-choice.selected {
+            background-color: #9B74B7;
+            color: white;
+            border-color: #9B74B7;
+        }
+
+        .therapist-card {
+            transition: all 0.3s ease;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            height: 820px;
+            display: flex;
+            flex-direction: column;
+            max-width: 380px;
+            position: relative;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .therapist-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .therapist-card img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            background: none;
+            transition: all 0.3s ease;
+        }
+
+        .therapist-card .image-container {
+            width: 100%;
+            aspect-ratio: 1;
+            background: none;
+            border-radius: 12px 12px 0 0;
+            overflow: hidden;
+        }
+
+        .therapist-card img:hover {
+            filter: brightness(1.05);
+        }
+
+        .chat-message {
+            background-color: white;
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin: 8px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .chat-message.bot {
+            text-align: left;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .white-panel {
+            background-color: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin: 24px auto;
+            max-width: 48rem;
+        }
+
+        .btn-primary {
+            background-color: #9B74B7;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            border: none;
+            font-weight: 600;
+            font-size: 1.125rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #4F064F;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(155, 116, 183, 0.25);
+        }
+
+        .therapist-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .therapist-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+            max-width: 100%;
+        }
+
+        /* 3-column layout for desktop when more than 3 cards */
+        @media (min-width: 1200px) {
+            .therapist-cards-grid {
+                grid-template-columns: repeat(3, minmax(300px, 380px));
+                justify-content: center;
+            }
+
+            /* If 1-2 cards, center them */
+            .therapist-cards-grid[data-card-count="1"] {
+                grid-template-columns: minmax(300px, 380px);
+            }
+
+            .therapist-cards-grid[data-card-count="2"] {
+                grid-template-columns: repeat(2, minmax(300px, 380px));
+            }
+        }
+
+        .results-tier {
+            margin-bottom: 2.5rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .results-tier h3 {
+            color: #4F064F;
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .results-tier p {
+            color: #6B7280;
+            text-align: left;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .specialty-tag {
+            background-color: #9B74B7;
+            color: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin: 0.25rem 0.25rem 0.25rem 0;
+            display: inline-block;
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-dots {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .progress-dot {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+            background-color: #d1d5db;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .card-content {
+            padding: 1.5rem 1.5rem 0 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+            padding-bottom: 240px;
+        }
+
+        .card-buttons {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 60px 1.5rem 1.5rem 1.5rem;
+            height: 200px;
+            justify-content: flex-end;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            background: white;
+            border: 2px solid #9B74B7;
+            color: #9B74B7;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-secondary:hover {
+            background-color: #9B74B7;
+            color: white;
+        }
+
+        .btn-secondary:focus,
+        .btn-book:focus,
+        .btn-primary:focus,
+        .option-button:focus,
+        .continue-btn:focus {
+            outline: 3px solid #9B74B7;
+            outline-offset: 2px;
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .therapist-card {
+                border: 2px solid #000;
+            }
+
+            .specialty-tag {
+                border: 1px solid #000;
+            }
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            .therapist-card,
+            .option-button,
+            .btn-primary,
+            .btn-secondary,
+            .btn-book,
+            .continue-btn,
+            .progress-dot {
+                transition: none;
+            }
+
+            .chat-bubble {
+                animation: none;
+            }
+        }
+
+        .btn-book {
+            width: 100%;
+            background-color: #9B74B7;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            min-height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-book:hover {
+            background-color: #4F064F;
+            box-shadow: 0 4px 12px rgba(155, 116, 183, 0.25);
+        }
+
+        .continue-btn {
+            background-color: #9B74B7;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 24px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .continue-btn:hover {
+            background-color: #4F064F;
+            transform: translateY(-2px);
+        }
+
+        .continue-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+
+        @media (max-width: 768px) {
+            .therapist-cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 0.5rem;
+            }
+
+
+            .white-panel {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Start Section -->
+        <div class="text-center" style="margin-bottom: 1rem;">
+            <button
+                id="start-btn"
+                onclick="startMatching()"
+                class="btn-primary"
+            >
+                Start Matching
+            </button>
+        </div>
+
+        <!-- Chat Interface -->
+        <div id="chat-interface" class="hidden">
+            <div class="white-panel">
+                <!-- Progress Bar -->
+                <div class="progress-container">
+                    <div class="progress-dots" id="progress-dots">
+                        <!-- Progress dots will be added dynamically -->
+                    </div>
+                    <span id="progress-text" style="font-size: 0.875rem; color: #6b7280;">1 of ?</span>
+                </div>
+
+                <!-- Chat Messages -->
+                <div id="chat-messages" style="margin-bottom: 1.5rem;">
+                    <!-- Messages will be added here dynamically -->
+                </div>
+
+                <!-- Options Container -->
+                <div id="options-container">
+                    <!-- Options will be added here dynamically -->
+                </div>
+
+                <!-- Continue Button for Multiple Choice -->
+                <div id="continue-container" class="hidden text-center">
+                    <button id="continue-btn" class="continue-btn" onclick="continueToNext()" disabled>
+                        Continue
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <section id="results-section" class="hidden" role="main" aria-label="Therapist matching results">
+            <div id="results-header" class="text-center" style="margin-bottom: 2rem;">
+                <!-- Headline removed as requested -->
+            </div>
+
+            <div id="therapist-cards" class="therapist-grid" role="region" aria-label="Recommended therapists">
+                <!-- Therapist cards will be added here -->
+            </div>
+
+            <div class="text-center" style="margin-top: 2rem;">
+                <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 1rem;">Not quite right?</p>
+                <div>
+                    <button onclick="restartQuiz()" style="color: #9B74B7; text-decoration: underline; background: none; border: none; cursor: pointer; margin-right: 1rem; font-size: 0.875rem;">
+                        Retake quiz
+                    </button>
+                    <button style="color: #9B74B7; text-decoration: underline; background: none; border: none; cursor: pointer; font-size: 0.875rem;">
+                        Explore all therapists
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Image paths for local/standalone use
+        const IMAGE_PATHS = [
+            './images/therapair/',
+            './images/',
+            'images/therapair/',
+            'images/',
+            '/images/therapair/',
+            '/therapair-images/',
+            '/images/'
+        ];
+
+        function getImagePath(filename) {
+            // Force absolute URLs for production deployment
+            const protocol = window.location.protocol;
+            const hostname = window.location.hostname;
+            const isLocalFile = protocol === 'file:';
+
+            // Debug logging
+            console.log('Image path debug:', {
+                filename,
+                hostname,
+                protocol,
+                href: window.location.href
+            });
+
+            // ALWAYS use absolute URLs for unisonmentalhealth.com
+            // This ensures images load correctly when deployed online
+            if (!isLocalFile && hostname) {
+                // Online deployment - use absolute HTTPS path to unisonmentalhealth.com
+                const path = `https://unisonmentalhealth.com/therapair-widget/images/${filename.replace('.jpg', '.jpeg')}`;
+                console.log('Using absolute production path:', path);
+                return path;
+            } else {
+                // Local file testing only - use relative path
+                const path = `images/${filename.replace('.jpg', '.jpeg')}`;
+                console.log('Using local file path:', path);
+                return path;
+            }
+        }
+
+        // Updated therapist data with new information
+        const therapists = [
+            {
+                name: "Nicki Nelis",
+                gender: "female",
+                image: getImagePath("nicki.jpg"),
+                tagline: "Gestalt therapist with nearly 20 years' experience, specializing in LGBTQI+, trauma survivors, and kink/ENM communities",
+                specialties: ["LGBTQI+ affirming", "Trauma survivors", "Kink community", "ENM relationships", "Sexual assault survivors", "Gestalt Therapy", "Psychodynamic Therapy"],
+                availability: "In-person Windsor (Thursdays 10am–7pm)",
+                tags: ["lgbtq", "trauma", "kink", "enm", "identity", "gestalt", "psychodynamic", "sexual_health", "addiction", "disability"],
+                accepting: true,
+                whoSupported: ["myself", "someone_else"],
+                ageGroups: ["adult", "under_18", "mixed"],
+                locations: ["in_person"],
+                funding: ["vocat", "fas", "ndis", "disability_pension"],
+                availability_days: ["thursday"],
+                urgency: ["few_weeks", "wait_for_right"],
+                approaches: ["gestalt", "emotion_focused", "somatic", "psychodynamic", "mindfulness", "trauma"],
+                communities: ["lgbtq", "kink", "disability"],
+                bookingUrl: "https://www.halaxy.com/book/appointment/counsellor/ms-nicki-nelis/1546141/1011071/select-time",
+                profileUrl: "https://unisonmentalhealth.com/meet-our-team/#team-nicki"
+            },
+            {
+                name: "Adam Forman",
+                gender: "male",
+                image: getImagePath("adam.jpg"),
+                tagline: "Counsellor & Mediator with two decades experience working with young people and adults, specializing in ethically non-monogamous relationships",
+                specialties: ["ENM relationships", "Opening relationships", "Relationship dynamics", "Attachment healing", "Mediation"],
+                availability: "Online & in-person Fitzroy North (Flexible)",
+                tags: ["enm", "relationship", "mediation", "young_people", "disability"],
+                accepting: true,
+                whoSupported: ["myself", "myself_partner", "someone_else"],
+                ageGroups: ["adult", "under_18", "mixed"],
+                locations: ["online", "in_person"],
+                funding: ["vocat", "fas", "ndis", "disability_pension"],
+                availability_days: ["monday", "tuesday", "wednesday", "thursday", "friday"],
+                urgency: ["asap", "fortnight", "few_weeks", "wait_for_right"],
+                approaches: ["relationship", "mindfulness", "trauma", "psychodynamic"],
+                communities: ["disability", "open"],
+                bookingEmail: "contact@unisonmentalhealth.com",
+                profileUrl: "https://unisonmentalhealth.com/meet-our-team/#team-adam"
+            },
+            {
+                name: "Natasha Lama",
+                gender: "female",
+                image: getImagePath("natasha.jpg"),
+                tagline: "Counsellor & Sex Therapist with cultural sensitivity, specializing in sex-positive approaches and cultural identity",
+                specialties: ["Sex therapy", "Cultural sensitivity", "Sexual health", "Cultural identity", "CBT", "Mindfulness"],
+                availability: "Online and in-person Windsor (Mondays noon–7pm, Saturdays 9am–2pm)",
+                tags: ["sexual_health", "cultural", "sex_positive", "cbt", "schema"],
+                accepting: true,
+                whoSupported: ["myself", "myself_partner", "someone_else"],
+                ageGroups: ["adult"],
+                locations: ["online", "in_person"],
+                funding: ["vocat", "fas", "ndis", "disability_pension"],
+                availability_days: ["monday", "saturday"],
+                urgency: ["asap", "fortnight", "few_weeks", "wait_for_right"],
+                approaches: ["cbt_dbt", "mindfulness", "trauma", "schema", "relationship", "somatic", "psychodynamic"],
+                communities: ["cultural", "kink", "open"],
+                bookingUrls: {
+                    inPerson: "https://www.halaxy.com/book/appointment/psychotherapist/ms-natasha-lama/1433041/1011071",
+                    telehealth: "https://www.halaxy.com/book/appointment/psychotherapist/ms-natasha-lama/1433041/700941"
+                },
+                profileUrl: "https://unisonmentalhealth.com/meet-our-team/#team-natasha"
+            },
+            {
+                name: "Genevieve Autret",
+                gender: "female",
+                image: getImagePath("genevieve.jpg"),
+                tagline: "Psychotherapist with 15+ years experience, specializing in psychedelic integration, relationship therapy and trauma-informed therapy",
+                specialties: ["Psychedelic integration", "Trauma therapy", "DBT", "Art therapy", "Harm reduction", "Couples therapy"],
+                availability: "Online (Tuesdays 4:30–6:30pm, Wednesdays noon–6pm)",
+                tags: ["psychedelic", "trauma", "art_therapy", "couples", "dbt"],
+                accepting: true,
+                whoSupported: ["myself", "myself_partner", "someone_else"],
+                ageGroups: ["adult"],
+                locations: ["online"],
+                funding: ["vocat", "fas", "ndis", "disability_pension"],
+                availability_days: ["monday", "tuesday", "wednesday", "thursday", "friday"],
+                urgency: ["asap", "fortnight", "few_weeks", "wait_for_right"],
+                approaches: ["art", "dbt", "mindfulness", "trauma", "relationship", "psychedelic", "somatic", "psychodynamic"],
+                communities: ["open"],
+                bookingUrl: "https://www.halaxy.com/book/appointment/psychotherapist/ms-genevieve-autret/1475001/700941",
+                profileUrl: "https://unisonmentalhealth.com/meet-our-team/#team-genevieve"
+            },
+            {
+                name: "Emma Steains",
+                gender: "female",
+                image: getImagePath("emma.jpg"),
+                tagline: "Clinical Psychologist specializing in veterans/ADF personnel, EMDR, ACT, and trauma recovery",
+                specialties: ["EMDR", "ACT", "CBT", "Veteran support", "ADF families", "Trauma recovery", "Internal Family Systems"],
+                availability: "Online (Wednesdays 2–6pm, Fridays 9am–5pm)",
+                tags: ["emdr", "veterans", "trauma", "cbt", "act", "ifs"],
+                accepting: true,
+                whoSupported: ["myself", "someone_else"],
+                ageGroups: ["adult", "under_18", "mixed"],
+                locations: ["online"],
+                funding: ["mental_health_plan", "open_arms", "vocat", "fas", "ndis", "disability_pension", "workcover"],
+                availability_days: ["wednesday", "friday"],
+                urgency: ["few_weeks", "wait_for_right"],
+                approaches: ["cbt_dbt", "mindfulness", "trauma", "internal_family", "somatic", "psychodynamic"],
+                communities: ["veterans", "disability", "open"],
+                bookingUrl: "https://www.halaxy.com/book/appointment/psychologist/ms-emma-steains/1269651/1167761/select-time",
+                profileUrl: "https://unisonmentalhealth.com/meet-our-team/#team-emma"
+            },
+            {
+                name: "Michael Spurrier",
+                gender: "male",
+                image: getImagePath("michael.jpg"),
+                tagline: "Clinical Psychologist providing warm, grounded therapy for trauma, relationships, neurodivergence, mood, and addiction",
+                specialties: ["Trauma therapy", "Relationship work", "Neurodivergent support", "Mood disorders", "Addiction", "Schema therapy"],
+                availability: "Coming mid-late October",
+                tags: ["trauma", "relationship", "addiction", "neurodivergent", "mood", "schema"],
+                accepting: false,
+                whoSupported: ["myself", "myself_partner", "someone_else"],
+                ageGroups: ["adult", "under_18", "mixed"],
+                locations: ["online"],
+                funding: ["mental_health_plan", "open_arms", "vocat", "fas", "ndis", "disability_pension", "workcover"],
+                availability_days: [],
+                urgency: [],
+                approaches: ["cbt_dbt", "mindfulness", "trauma", "relationship", "schema", "psychedelic", "psychodynamic"],
+                communities: ["disability", "open"],
+                profileUrl: "https://unisonmentalhealth.com/meet-our-team/#team-michael"
+            },
+            {
+                name: "Meg Wilson",
+                gender: "female",
+                image: getImagePath("meg.jpg"),
+                tagline: "Founder & Psychotherapist with over 12 years experience in relationship therapy, DBT/trauma-informed therapy, and art therapy",
+                specialties: ["Art psychotherapy", "DBT", "Mindfulness", "Relationship therapy", "Non-traditional relationships"],
+                availability: "Currently not accepting new clients",
+                tags: ["art_therapy", "relationship", "founder", "dbt", "non_traditional"],
+                accepting: false,
+                whoSupported: ["myself", "myself_partner", "someone_else"],
+                ageGroups: ["adult"],
+                locations: ["online", "in_person"],
+                funding: ["vocat", "fas", "ndis", "disability_pension"],
+                availability_days: [],
+                urgency: [],
+                approaches: ["art", "cbt_dbt", "mindfulness", "trauma", "relationship", "psychedelic", "somatic", "psychodynamic"],
+                communities: ["lgbtq", "kink", "disability", "open"],
+                profileUrl: "https://unisonmentalhealth.com/meet-our-team/#team-meg"
+            },
+            {
+                name: "Joe Stark",
+                gender: "male",
+                image: getImagePath("joe.jpg"),
+                tagline: "Psychiatrist & Psychotherapist, pioneer in psychedelic-assisted therapy and mindfulness teacher",
+                specialties: ["Psychiatry", "Psychedelic therapy", "Mindfulness", "Chronic pain", "Trauma", "Anxiety"],
+                availability: "Not accepting new clients; medication-assisted treatments by enquiry",
+                tags: ["psychedelic", "psychiatry", "mindfulness", "chronic_pain"],
+                accepting: false,
+                whoSupported: ["myself", "someone_else"],
+                ageGroups: ["adult"],
+                locations: ["online"],
+                funding: ["vocat", "fas", "ndis", "disability_pension"],
+                availability_days: [],
+                urgency: [],
+                approaches: ["mindfulness", "trauma", "psychedelic", "psychodynamic"],
+                communities: ["open"],
+                profileUrl: "https://unisonmentalhealth.com/meet-our-team/#team-joe"
+            }
+        ];
+
+        // Adaptive question flow with conditional logic
+        const questionFlow = [
+            {
+                id: "who",
+                text: "Who is seeking therapy?",
+                type: "single",
+                options: [
+                    { text: "For myself", value: "myself" },
+                    { text: "For myself and my partner(s)", value: "myself_partner" },
+                    { text: "For someone else", value: "someone_else" }
+                ]
+            },
+            {
+                id: "age",
+                text: "Is the person(s) seeking therapy over 18?",
+                type: "single",
+                options: [
+                    { text: "Yes", value: "adult" },
+                    { text: "No", value: "under_18" },
+                    { text: "One person is over 18 and one person is under 18", value: "mixed" }
+                ]
+            },
+            {
+                id: "location",
+                text: "Our practice is located in Melbourne but we also offer telehealth sessions via zoom, which option is better for you?",
+                type: "single",
+                options: [
+                    { text: "Online Appointments", value: "online" },
+                    { text: "In-person Appointments", value: "in_person" },
+                    { text: "Either online or in-person", value: "either" }
+                ]
+            },
+            {
+                id: "concerns",
+                text: "What brings you to therapy?",
+                type: "multiple",
+                options: [
+                    { text: "Relationship challenges", value: "relationship" },
+                    { text: "Anxiety or depression", value: "anxiety_depression" },
+                    { text: "Trauma or PTSD", value: "trauma" },
+                    { text: "Identity exploration", value: "identity" },
+                    { text: "Sexual health concerns", value: "sexual_health" },
+                    { text: "Psychedelic therapy/integration", value: "psychedelic" },
+                    { text: "Addiction recovery", value: "addiction" },
+                    { text: "General Support", value: "general" }
+                ]
+            },
+            {
+                id: "funding",
+                text: "Do any of the following funding options apply to you?",
+                type: "multiple",
+                options: [
+                    { text: "Mental Health Care Plan", value: "mental_health_plan" },
+                    { text: "Open Arms / ADF", value: "open_arms" },
+                    { text: "VOCAT or FAS", value: "vocat" },
+                    { text: "NDIS", value: "ndis" },
+                    { text: "Disability Pension", value: "disability_pension" },
+                    { text: "Workcover", value: "workcover" },
+                    { text: "None of these apply", value: "none" }
+                ]
+            },
+            {
+                id: "availability",
+                text: "Please select each day of the week you are available for therapy. The more days you choose the more matches you will get.",
+                type: "multiple",
+                options: [
+                    { text: "Monday", value: "monday" },
+                    { text: "Tuesday", value: "tuesday" },
+                    { text: "Wednesday", value: "wednesday" },
+                    { text: "Thursday", value: "thursday" },
+                    { text: "Friday", value: "friday" },
+                    { text: "Saturday", value: "saturday" },
+                    { text: "I'm flexible with timing", value: "flexible" }
+                ]
+            },
+            {
+                id: "urgency",
+                text: "When would you ideally start therapy?",
+                type: "single",
+                note: "We are not a crisis service and therefore unable to offer same-day or last minute appointments.",
+                options: [
+                    { text: "ASAP", value: "asap" },
+                    { text: "Sometime in the next fortnight", value: "fortnight" },
+                    { text: "Happy to wait a few weeks", value: "few_weeks" },
+                    { text: "I don't mind waiting for the right therapist", value: "wait_for_right" }
+                ]
+            },
+            {
+                id: "approach",
+                text: "What type of therapy approach interests you most?",
+                type: "multiple",
+                options: [
+                    { text: "Mindfulness/acceptance-based", value: "mindfulness" },
+                    { text: "CBT/DBT skills-focused", value: "cbt_dbt" },
+                    { text: "Trauma-specific approaches", value: "trauma" },
+                    { text: "Relationship Therapy", value: "relationship" },
+                    { text: "Psychodynamic approach", value: "psychodynamic" },
+                    { text: "Art-based therapy", value: "art" },
+                    { text: "Gestalt", value: "gestalt" },
+                    { text: "Emotion-focused Therapy (EMDR)", value: "emotion_focused" },
+                    { text: "Somatic Therapy", value: "somatic" },
+                    { text: "Internal Family Systems", value: "internal_family" },
+                    { text: "Psychedelic Integration", value: "psychedelic" },
+                    { text: "Schema Therapy", value: "schema" },
+                    { text: "No preference/unsure", value: "no_preference" }
+                ]
+            },
+            {
+                id: "community",
+                text: "Would you prefer that your therapist have lived experience or special knowledge in any of the following communities?",
+                type: "multiple",
+                options: [
+                    { text: "LGBTQIA+ community", value: "lgbtq" },
+                    { text: "Kink community", value: "kink" },
+                    { text: "Cultural/ethnic minority", value: "cultural" },
+                    { text: "Disability or Chronic illness", value: "disability" },
+                    { text: "Veterans/ADF personnel or family", value: "veterans" },
+                    { text: "I'm open to any qualified therapist", value: "open" }
+                ]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let responses = {};
+        let selectedMultipleChoices = [];
+        let activeQuestions = [];
+
+        function startMatching() {
+            currentQuestionIndex = 0;
+            responses = {};
+            selectedMultipleChoices = [];
+
+            // Determine which questions to show based on initial logic
+            activeQuestions = [...questionFlow];
+
+            document.getElementById('chat-messages').innerHTML = '';
+            document.getElementById('options-container').innerHTML = '';
+            document.getElementById('continue-container').classList.add('hidden');
+
+            updateProgressDots();
+            document.getElementById('progress-text').textContent = '1 of ' + activeQuestions.length;
+            document.getElementById('start-btn').style.display = 'none';
+            document.getElementById('chat-interface').classList.remove('hidden');
+
+            showQuestion(0);
+        }
+
+        function updateProgressDots() {
+            const progressDots = document.getElementById('progress-dots');
+            progressDots.innerHTML = '';
+
+            for (let i = 0; i < activeQuestions.length; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'progress-dot';
+                if (i <= currentQuestionIndex) {
+                    dot.classList.add('active');
+                }
+                progressDots.appendChild(dot);
+            }
+        }
+
+        function showQuestion(index) {
+            currentQuestionIndex = index;
+            const question = activeQuestions[index];
+
+            updateProgressDots();
+            document.getElementById('progress-text').textContent = `${index + 1} of ${activeQuestions.length}`;
+
+            document.getElementById('chat-messages').innerHTML = '';
+            document.getElementById('options-container').innerHTML = '';
+            document.getElementById('continue-container').classList.add('hidden');
+
+            // Add question as chat bubble
+            let questionText = question.text;
+            if (question.type === 'multiple') {
+                questionText += `<br><small style="color: #6B7280; font-size: 0.9rem; font-style: italic;">Select all that apply</small>`;
+            }
+            if (question.note) {
+                questionText += `<br><small style="color: #6b7280; font-style: italic;">${question.note}</small>`;
+            }
+            addChatBubble(questionText, 'bot');
+
+            selectedMultipleChoices = [];
+
+            setTimeout(() => {
+                question.options.forEach((option, i) => {
+                    setTimeout(() => {
+                        addOptionButton(option, question.type);
+                    }, i * 100);
+                });
+
+                if (question.type === 'multiple') {
+                    document.getElementById('continue-container').classList.remove('hidden');
+                }
+            }, 500);
+        }
+
+        function addChatBubble(message, sender) {
+            const chatMessages = document.getElementById('chat-messages');
+            const bubble = document.createElement('div');
+
+            if (sender === 'bot') {
+                bubble.className = 'chat-message bot';
+                bubble.innerHTML = message;
+            } else {
+                bubble.className = 'chat-bubble';
+                bubble.style.display = 'flex';
+                bubble.style.justifyContent = 'flex-end';
+                bubble.innerHTML = `
+                    <div style="max-width: 20rem; padding: 0.75rem 1rem; border-radius: 1rem; color: white; background-color: #9B74B7;">
+                        ${message}
+                    </div>
+                `;
+            }
+
+            chatMessages.appendChild(bubble);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addOptionButton(option, questionType) {
+            const container = document.getElementById('options-container');
+            const button = document.createElement('button');
+
+            if (questionType === 'multiple') {
+                button.className = 'option-button multiple-choice';
+                button.onclick = () => toggleMultipleChoice(option, button);
+            } else {
+                button.className = 'option-button';
+                button.onclick = () => selectSingleOption(option, button);
+            }
+
+            button.textContent = option.text;
+            container.appendChild(button);
+        }
+
+        function toggleMultipleChoice(option, buttonElement) {
+            const index = selectedMultipleChoices.findIndex(choice => choice.value === option.value);
+
+            if (index > -1) {
+                // Remove from selection
+                selectedMultipleChoices.splice(index, 1);
+                buttonElement.classList.remove('selected');
+            } else {
+                // Add to selection
+                selectedMultipleChoices.push(option);
+                buttonElement.classList.add('selected');
+            }
+
+            // Enable/disable continue button
+            const continueBtn = document.getElementById('continue-btn');
+            continueBtn.disabled = selectedMultipleChoices.length === 0;
+        }
+
+        function continueToNext() {
+            const question = activeQuestions[currentQuestionIndex];
+            responses[question.id] = selectedMultipleChoices.map(choice => choice.value);
+
+            proceedToNext();
+        }
+
+        function selectSingleOption(option, buttonElement) {
+            const question = activeQuestions[currentQuestionIndex];
+
+            buttonElement.classList.add('selected');
+            buttonElement.disabled = true;
+
+            responses[question.id] = option.value;
+
+            // Disable other options
+            const allOptions = document.querySelectorAll('.option-button');
+            allOptions.forEach(opt => opt.disabled = true);
+
+            setTimeout(() => {
+                proceedToNext();
+            }, 1000);
+        }
+
+        function proceedToNext() {
+            // Adaptive logic - modify questions based on responses
+            adaptQuestionFlow();
+
+            if (currentQuestionIndex < activeQuestions.length - 1) {
+                showQuestion(currentQuestionIndex + 1);
+            } else {
+                showResults();
+            }
+        }
+
+        function adaptQuestionFlow() {
+            // Example adaptive logic - can be expanded
+            // Skip certain questions based on responses
+
+            // If someone else is seeking therapy, might skip personal preference questions
+            if (responses.who === 'someone_else') {
+                // Could adapt certain questions here
+            }
+
+            // If only online selected, skip location-specific questions
+            if (responses.location === 'online') {
+                // Remove in-person specific logic
+            }
+        }
+
+        function showResults() {
+            document.getElementById('chat-interface').classList.add('hidden');
+            document.getElementById('results-section').classList.remove('hidden');
+
+            const matchResults = getMatchedTherapists();
+            displayTieredResults(matchResults);
+        }
+
+        function getMatchedTherapists() {
+            // Start with all accepting therapists
+            let allTherapists = therapists.filter(t => t.accepting);
+            let bestMatches = [];
+            let eligibleTherapists = [...allTherapists];
+
+            // Apply strict filters for best matches
+            // Who they support
+            if (responses.who) {
+                eligibleTherapists = eligibleTherapists.filter(t =>
+                    t.whoSupported.includes(responses.who)
+                );
+            }
+
+            // Age groups
+            if (responses.age) {
+                eligibleTherapists = eligibleTherapists.filter(t =>
+                    t.ageGroups.includes(responses.age)
+                );
+            }
+
+            // Location preference (unless 'either')
+            if (responses.location && responses.location !== 'either') {
+                eligibleTherapists = eligibleTherapists.filter(t =>
+                    t.locations.includes(responses.location)
+                );
+            }
+
+            // Funding options (only filter if not "none")
+            if (responses.funding && responses.funding.length > 0 && !responses.funding.includes('none')) {
+                eligibleTherapists = eligibleTherapists.filter(t =>
+                    responses.funding.some(funding => {
+                        if (funding === 'vocat') {
+                            return t.funding.includes('vocat') || t.funding.includes('fas');
+                        }
+                        return t.funding.includes(funding);
+                    })
+                );
+            }
+
+            // Availability days (unless 'flexible')
+            if (responses.availability && responses.availability.length > 0 && !responses.availability.includes('flexible')) {
+                eligibleTherapists = eligibleTherapists.filter(t =>
+                    responses.availability.some(day => t.availability_days.includes(day))
+                );
+            }
+
+            // Score and match based on specialties
+            const scoredMatches = [];
+
+            eligibleTherapists.forEach(therapist => {
+                let score = 0;
+
+                // Score based on concerns/specialties
+                if (responses.concerns) {
+                    const concernsArray = Array.isArray(responses.concerns) ? responses.concerns : [responses.concerns];
+                    concernsArray.forEach(concern => {
+                        switch(concern) {
+                            case 'relationship':
+                                if (therapist.tags.includes('relationship')) score += 3;
+                                break;
+                            case 'trauma':
+                                if (therapist.tags.includes('trauma')) score += 3;
+                                break;
+                            case 'sexual_health':
+                                if (therapist.tags.includes('sexual_health')) score += 3;
+                                break;
+                            case 'psychedelic':
+                                if (therapist.tags.includes('psychedelic')) score += 3;
+                                break;
+                            case 'addiction':
+                                if (therapist.tags.includes('addiction')) score += 3;
+                                break;
+                            case 'identity':
+                                if (therapist.tags.includes('identity')) score += 3;
+                                break;
+                            case 'lgbtq':
+                                if (therapist.tags.includes('lgbtq')) score += 3;
+                                break;
+                            case 'cultural':
+                                if (therapist.tags.includes('cultural')) score += 3;
+                                break;
+                            case 'veterans':
+                                if (therapist.tags.includes('veterans')) score += 3;
+                                break;
+                            case 'neurodivergent':
+                                if (therapist.tags.includes('neurodivergent')) score += 3;
+                                break;
+                            case 'mood':
+                                if (therapist.tags.includes('mood')) score += 3;
+                                break;
+                            case 'chronic_pain':
+                                if (therapist.tags.includes('chronic_pain')) score += 3;
+                                break;
+                            case 'art_therapy':
+                                if (therapist.tags.includes('art_therapy')) score += 3;
+                                break;
+                            case 'kink':
+                                if (therapist.tags.includes('kink')) score += 3;
+                                break;
+                            case 'enm':
+                                if (therapist.tags.includes('enm')) score += 3;
+                                break;
+                            default:
+                                score += 1; // General support
+                        }
+                    });
+                }
+
+                // Score based on community preferences
+                if (responses.community) {
+                    const communityArray = Array.isArray(responses.community) ? responses.community : [responses.community];
+                    communityArray.forEach(community => {
+                        if (community !== 'open' && therapist.communities.includes(community)) {
+                            score += 2;
+                        }
+                    });
+                }
+
+                // Score based on approach preferences
+                if (responses.approach) {
+                    const approachArray = Array.isArray(responses.approach) ? responses.approach : [responses.approach];
+                    approachArray.forEach(approach => {
+                        if (approach !== 'no_preference' && therapist.approaches.includes(approach)) {
+                            score += 2;
+                        }
+                    });
+                }
+
+                scoredMatches.push({ therapist, score });
+            });
+
+            // Sort by score (highest first)
+            scoredMatches.sort((a, b) => b.score - a.score);
+
+            // Get best matches (score > 0 - actual matches) - limited to max 3 total
+            bestMatches = scoredMatches
+                .filter(match => match.score > 0)
+                .slice(0, 3)
+                .map(match => match.therapist);
+
+            // If no direct matches (score > 0), show closely aligned therapists
+            if (bestMatches.length === 0) {
+                // Use top scored eligible therapists (max 3)
+                bestMatches = scoredMatches.slice(0, 3).map(match => match.therapist);
+
+                // If still no matches, use all accepting therapists (max 3)
+                if (bestMatches.length === 0) {
+                    bestMatches = allTherapists.slice(0, 3);
+                }
+
+                // Mark these as closely aligned results
+                return {
+                    bestMatches: bestMatches,
+                    fallbackMatches: [],
+                    isDirectMatch: false
+                };
+            }
+
+            // We have direct matches - calculate how many alternatives to show (max 3 total)
+            const maxAlternatives = Math.max(0, 3 - bestMatches.length);
+            const fallbackMatches = scoredMatches
+                .map(match => match.therapist)
+                .filter(therapist => !bestMatches.includes(therapist))
+                .slice(0, maxAlternatives);
+
+            return {
+                bestMatches: bestMatches,
+                fallbackMatches: fallbackMatches,
+                isDirectMatch: true
+            };
+        }
+
+        function displayTieredResults(matchResults) {
+            const container = document.getElementById('therapist-cards');
+            const headerElement = document.getElementById('results-header');
+            container.innerHTML = ''; // Clear existing content
+
+            // Check if we have actual direct matches vs fallback only
+            const hasDirectMatches = matchResults.isDirectMatch;
+
+            if (!hasDirectMatches) {
+                // No direct matches - show closely aligned therapists
+                headerElement.innerHTML = ``;
+
+                const closelyAlignedSection = document.createElement('div');
+                closelyAlignedSection.className = 'results-tier';
+                closelyAlignedSection.innerHTML = `
+                    <h3 style="color: #4F064F; font-size: 1.25rem; font-weight: 500; margin-bottom: 0.5rem; text-align: left;">
+                        These therapists align closely with your preferences
+                    </h3>
+                `;
+                container.appendChild(closelyAlignedSection);
+
+                const cardsContainer = document.createElement('div');
+                cardsContainer.className = 'therapist-cards-grid';
+                cardsContainer.setAttribute('data-card-count', matchResults.bestMatches.length);
+                closelyAlignedSection.appendChild(cardsContainer);
+
+                matchResults.bestMatches.forEach((therapist, index) => {
+                    setTimeout(() => {
+                        const card = createTherapistCard(therapist);
+                        cardsContainer.appendChild(card);
+                    }, index * 200);
+                });
+            } else {
+                // We have direct matches - show with "Best match" headline
+                headerElement.innerHTML = ``;
+
+                const bestSection = document.createElement('div');
+                bestSection.className = 'results-tier';
+                bestSection.innerHTML = `
+                    <h3 style="color: #4F064F; font-size: 1.25rem; font-weight: 500; margin-bottom: 1.5rem; text-align: left;">
+                        ${matchResults.bestMatches.length === 1 ? 'Best match' : 'Best matches'}
+                    </h3>
+                `;
+                container.appendChild(bestSection);
+
+                const bestCardsContainer = document.createElement('div');
+                bestCardsContainer.className = 'therapist-cards-grid';
+                bestCardsContainer.setAttribute('data-card-count', matchResults.bestMatches.length);
+                bestSection.appendChild(bestCardsContainer);
+
+                matchResults.bestMatches.forEach((therapist, index) => {
+                    setTimeout(() => {
+                        const card = createTherapistCard(therapist);
+                        bestCardsContainer.appendChild(card);
+                    }, index * 200);
+                });
+
+                // Display fallback matches section if available
+                if (matchResults.fallbackMatches.length > 0) {
+                    setTimeout(() => {
+                        const fallbackSection = document.createElement('div');
+                        fallbackSection.className = 'results-tier';
+                        fallbackSection.style.marginTop = '3rem';
+                        fallbackSection.innerHTML = `
+                            <h3 style="color: #4F064F; font-size: 1.25rem; font-weight: 500; margin-bottom: 1.5rem; text-align: left;">
+                                These therapists align closely with your preferences
+                            </h3>
+                        `;
+                        container.appendChild(fallbackSection);
+
+                        const fallbackCardsContainer = document.createElement('div');
+                        fallbackCardsContainer.className = 'therapist-cards-grid';
+                        fallbackCardsContainer.setAttribute('data-card-count', matchResults.fallbackMatches.length);
+                        fallbackSection.appendChild(fallbackCardsContainer);
+
+                        matchResults.fallbackMatches.forEach((therapist, index) => {
+                            setTimeout(() => {
+                                const card = createTherapistCard(therapist);
+                                fallbackCardsContainer.appendChild(card);
+                            }, (index + matchResults.bestMatches.length) * 200);
+                        });
+                    }, matchResults.bestMatches.length * 200 + 500);
+                }
+            }
+        }
+
+        function generateBookingButton(therapist) {
+            if (!therapist.accepting) {
+                return `<button
+                    class="btn-book"
+                    style="background-color: #f3f4f6; color: #6b7280; cursor: not-allowed;"
+                    disabled
+                    aria-label="Currently not accepting new clients"
+                >
+                    Currently Unavailable
+                </button>`;
+            }
+
+            return `<button
+                class="btn-book"
+                onclick="openBookingForm(${JSON.stringify(therapist).replace(/"/g, '&quot;')})"
+                aria-label="Book appointment with ${therapist.name}"
+            >
+                Book Now
+            </button>`;
+        }
+
+        function createTherapistCard(therapist) {
+            const card = document.createElement('div');
+            card.className = 'therapist-card';
+
+            // Generate gradient fallback
+            const nameHash = therapist.name.split('').reduce((a, b) => {
+                a = ((a << 5) - a) + b.charCodeAt(0);
+                return a & a;
+            }, 0);
+            const hue = Math.abs(nameHash) % 360;
+            const fallbackGradient = `linear-gradient(45deg, hsl(${hue}, 70%, 60%), hsl(${(hue + 60) % 360}, 70%, 70%))`;
+
+            card.innerHTML = `
+                <article role="article" aria-labelledby="therapist-${therapist.name.replace(/\s+/g, '-').toLowerCase()}">
+                    <div class="image-container">
+                        <img
+                            src="${therapist.image}"
+                            alt="Profile photo of ${therapist.name}, ${therapist.specialties[0]} therapist"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                            loading="lazy"
+                        />
+                        <div style="display: none; width: 100%; height: 100%; ${fallbackGradient}; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.2rem;" aria-label="Initials for ${therapist.name}">
+                            ${therapist.name.split(' ').map(n => n[0]).join('')}
+                        </div>
+                    </div>
+
+                    <div class="card-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h3 id="therapist-${therapist.name.replace(/\s+/g, '-').toLowerCase()}" style="color: #111827; margin-bottom: 0.75rem; font-size: 1.1rem; font-weight: 600; margin-top: 0; line-height: 1.3;">${therapist.name}</h3>
+                            <p style="color: #6b7280; font-size: 0.85rem; line-height: 1.4; margin: 0; min-height: 2.8rem;">${therapist.tagline}</p>
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem; flex: 1; display: flex; flex-direction: column; min-height: 140px;">
+                            <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem; font-weight: 500; margin-top: 0;" id="specialties-${therapist.name.replace(/\s+/g, '-').toLowerCase()}">Specializes in:</p>
+                            <div aria-labelledby="specialties-${therapist.name.replace(/\s+/g, '-').toLowerCase()}" style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start;">
+                                <div style="flex-wrap: wrap; display: flex; align-items: flex-start; align-content: flex-start; margin-bottom: 3rem;">
+                                    ${therapist.specialties.slice(0, 3).map(specialty => `
+                                        <span class="specialty-tag" role="text">${specialty}</span>
+                                    `).join('')}
+                                    ${therapist.specialties.length > 3 ? `
+                                        <span style="background-color: #f9fafb; color: #6b7280; border: 1px solid #e5e7eb; padding: 0.375rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; margin: 0.25rem 0.25rem 0.25rem 0; display: inline-block;" role="text">
+                                            +${therapist.specialties.length - 3} more specialties
+                                        </span>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-buttons" style="padding-bottom: 1.5rem;">
+                            <button
+                                class="btn-secondary"
+                                onclick="openProfilePage('${therapist.profileUrl || 'https://unisonmentalhealth.com/meet-our-team/'}')"
+                                aria-label="View full profile for ${therapist.name}"
+                            >
+                                View Profile
+                            </button>
+                            ${generateBookingButton(therapist)}
+                        </div>
+                    </div>
+                </article>
+            `;
+
+            return card;
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            responses = {};
+            selectedMultipleChoices = [];
+
+            document.getElementById('chat-messages').innerHTML = '';
+            document.getElementById('options-container').innerHTML = '';
+            document.getElementById('continue-container').classList.add('hidden');
+
+            document.getElementById('results-section').classList.add('hidden');
+            document.getElementById('chat-interface').classList.remove('hidden');
+            document.getElementById('start-btn').style.display = 'none';
+
+            const therapistCards = document.getElementById('therapist-cards');
+            if (therapistCards) {
+                therapistCards.innerHTML = '';
+            }
+
+            startMatching();
+        }
+
+        // Chrome-compatible profile navigation
+        function openProfilePage(profileUrl) {
+            if (profileUrl.includes('#')) {
+                // For anchor links, try direct navigation first
+                const newWindow = window.open(profileUrl, '_blank');
+
+                // Fallback: try to scroll to element after a delay
+                if (newWindow) {
+                    setTimeout(() => {
+                        try {
+                            const anchor = profileUrl.split('#')[1];
+                            const targetElement = newWindow.document.getElementById(anchor);
+                            if (targetElement) {
+                                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                        } catch (e) {
+                            // Cross-origin restrictions may prevent this, but direct navigation should work
+                            console.log('Direct anchor navigation attempted');
+                        }
+                    }, 1000);
+                }
+            } else {
+                window.open(profileUrl, '_blank');
+            }
+        }
+
+        // Store user responses for the booking form
+        let userBookingData = {};
+
+        // Open booking form with personalized information
+        function openBookingForm(therapist) {
+            // Store the selected therapist data
+            userBookingData.selectedTherapist = therapist.name;
+            userBookingData.selectedSpecialty = therapist.specialties[0];
+            userBookingData.therapistData = therapist;
+            userBookingData.userResponses = {...responses};
+
+            // Create and show the booking form
+            createBookingForm();
+        }
+
+        function createBookingForm() {
+            // Create modal overlay
+            const overlay = document.createElement('div');
+            overlay.id = 'booking-modal';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                padding: 20px;
+                box-sizing: border-box;
+            `;
+
+            // Create modal content
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background: white;
+                border-radius: 16px;
+                padding: 2rem;
+                max-width: 600px;
+                width: 100%;
+                max-height: 90vh;
+                overflow-y: auto;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            `;
+
+            // Generate summary of user preferences
+            const preferencesSummary = generatePreferencesSummary();
+
+            modal.innerHTML = `
+                <div style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e5e7eb;">
+                    <div style="width: 170px; height: 170px; border-radius: 12px; overflow: hidden; flex-shrink: 0;">
+                        <img src="${userBookingData.therapistData.image}"
+                             alt="${userBookingData.selectedTherapist}"
+                             style="width: 100%; height: 100%; object-fit: cover;"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                        <div style="display: none; width: 100%; height: 100%; background: #f3f4f6; align-items: center; justify-content: center; color: #6b7280; font-weight: bold; font-size: 1.5rem;">
+                            ${userBookingData.selectedTherapist.split(' ').map(n => n[0]).join('')}
+                        </div>
+                    </div>
+                    <div style="flex: 1;">
+                        <h2 style="color: #111827; margin: 0 0 0.25rem 0; font-size: 1.25rem; font-weight: 600;">${userBookingData.selectedTherapist}</h2>
+                        <p style="color: #6b7280; margin: 0 0 0.5rem 0; font-size: 0.875rem;">${userBookingData.therapistData.tagline}</p>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            ${userBookingData.therapistData.specialties.slice(0, 4).map(specialty =>
+                                `<span style="background: #9B74B7; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem; font-weight: 500;">${specialty}</span>`
+                            ).join('')}
+                            ${userBookingData.therapistData.specialties.length > 4 ?
+                                `<span style="background: #f3f4f6; color: #6b7280; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem; font-weight: 500;">+${userBookingData.therapistData.specialties.length - 4} more</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="color: #111827; margin: 0 0 1rem 0; font-size: 1.125rem; font-weight: 600;">Book with ${userBookingData.selectedTherapist}</h3>
+                <div style="background: #f9fafb; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                    <h4 style="color: #4F064F; margin-bottom: 1rem; font-size: 1.1rem;">Your Preferences Summary</h4>
+                    ${preferencesSummary}
+                    <p style="margin: 1rem 0 0 0; color: #374151;"><strong>Selected Therapist:</strong> ${userBookingData.selectedTherapist}</p>
+                    <p style="margin: 0.5rem 0 0 0; color: #374151;"><strong>Specializes in:</strong> ${userBookingData.selectedSpecialty}</p>
+                </div>
+
+                <h3 style="color: #111827; margin: 0 0 1rem 0; font-size: 1.125rem; font-weight: 600;">Your Contact Information</h3>
+                <form id="booking-form">
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #111827; font-size: 0.875rem;">Full Name *</label>
+                        <input type="text" id="fullName" required style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.875rem; box-sizing: border-box; background: #f9fafb;" placeholder="Enter your full name">
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #111827; font-size: 0.875rem;">Email Address *</label>
+                        <input type="email" id="email" required style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.875rem; box-sizing: border-box; background: #f9fafb;" placeholder="Enter your email address">
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #111827; font-size: 0.875rem;">Phone Number *</label>
+                        <input type="tel" id="phone" required style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.875rem; box-sizing: border-box; background: #f9fafb;" placeholder="Enter your phone number">
+                    </div>
+
+                    <div style="background: #eff6ff; border: 1px solid #dbeafe; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+                        <p style="color: #1d4ed8; margin: 0; font-size: 0.875rem; font-weight: 500;">
+                            <strong>Next steps:</strong> We will respond within one business day to arrange your first session and discuss session details.
+                        </p>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="button" onclick="closeBookingForm()" style="flex: 1; padding: 0.875rem; background: white; border: 1px solid #d1d5db; color: #374151; border-radius: 8px; font-weight: 500; cursor: pointer; font-size: 0.875rem;">
+                            Cancel
+                        </button>
+                        <button type="submit" style="flex: 1; padding: 0.875rem; background: #d4b5d8; color: #111827; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.875rem;">
+                            Send Booking Request
+                        </button>
+                    </div>
+                </form>
+            `;
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            // Add form submission handler
+            document.getElementById('booking-form').addEventListener('submit', handleBookingSubmission);
+
+            // Close modal when clicking overlay
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    closeBookingForm();
+                }
+            });
+
+            // Prevent body scroll when modal is open
+            document.body.style.overflow = 'hidden';
+        }
+
+        function generatePreferencesSummary() {
+            let summary = [];
+
+            if (userBookingData.userResponses.who) {
+                const whoText = userBookingData.userResponses.who === 'myself' ? 'therapy for yourself' :
+                               userBookingData.userResponses.who === 'myself_partner' ? 'couples therapy' : 'therapy for someone else';
+                summary.push(`<p style="margin: 0.5rem 0; color: #374151;"><strong>Seeking:</strong> ${whoText}</p>`);
+            }
+
+            if (userBookingData.userResponses.location) {
+                const locationText = userBookingData.userResponses.location === 'online' ? 'Online sessions' :
+                                   userBookingData.userResponses.location === 'in_person' ? 'In-person sessions' : 'Either online or in-person';
+                summary.push(`<p style="margin: 0.5rem 0; color: #374151;"><strong>Format:</strong> ${locationText}</p>`);
+            }
+
+            if (userBookingData.userResponses.concerns && userBookingData.userResponses.concerns.length > 0) {
+                const concernsMapping = {
+                    "relationship": "Relationship challenges",
+                    "anxiety_depression": "Anxiety or depression",
+                    "trauma": "Trauma or PTSD",
+                    "identity": "Identity exploration",
+                    "sexual_health": "Sexual health concerns",
+                    "psychedelic": "Psychedelic therapy/integration",
+                    "addiction": "Addiction recovery",
+                    "general": "General Support"
+                };
+                const concernsText = userBookingData.userResponses.concerns
+                    .map(concern => concernsMapping[concern] || concern)
+                    .join(', ');
+                summary.push(`<p style="margin: 0.5rem 0; color: #374151;"><strong>Primary concerns:</strong> ${concernsText}</p>`);
+            }
+
+            if (userBookingData.userResponses.urgency) {
+                const urgencyText = userBookingData.userResponses.urgency === 'asap' ? 'As soon as possible' :
+                                  userBookingData.userResponses.urgency === 'fortnight' ? 'Within 2 weeks' :
+                                  userBookingData.userResponses.urgency === 'few_weeks' ? 'Within a few weeks' : 'Willing to wait for the right therapist';
+                summary.push(`<p style="margin: 0.5rem 0; color: #374151;"><strong>Timeline:</strong> ${urgencyText}</p>`);
+            }
+
+            return summary.join('') || '<p style="margin: 0; color: #6b7280;">Based on your preferences</p>';
+        }
+
+        function handleBookingSubmission(e) {
+            e.preventDefault();
+
+            const formData = {
+                fullName: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                selectedTherapist: userBookingData.selectedTherapist,
+                selectedSpecialty: userBookingData.selectedSpecialty,
+                preferences: userBookingData.userResponses,
+                timestamp: new Date().toISOString()
+            };
+
+            // For demo purposes, log the data (replace with actual form submission)
+            console.log('Booking form data:', formData);
+
+            // Show success message
+            showBookingSuccess();
+        }
+
+        function showBookingSuccess() {
+            const modal = document.querySelector('#booking-modal > div');
+            modal.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="width: 64px; height: 64px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                        <svg width="32" height="32" fill="white" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <h2 style="color: #4F064F; margin-bottom: 1rem;">Request Sent Successfully!</h2>
+                    <p style="color: #6b7280; margin-bottom: 2rem;">We'll contact you within 24 hours to schedule your appointment with ${userBookingData.selectedTherapist}.</p>
+                    <button onclick="closeBookingForm()" style="padding: 0.875rem 2rem; background: #9B74B7; color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer;">
+                        Close
+                    </button>
+                </div>
+            `;
+        }
+
+        function closeBookingForm() {
+            const modal = document.getElementById('booking-modal');
+            if (modal) {
+                modal.remove();
+            }
+            // Restore body scroll
+            document.body.style.overflow = '';
+        }
+    </script>
+</body>
+</html>
