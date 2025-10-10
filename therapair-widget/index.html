@@ -1351,13 +1351,6 @@
                         </div>
 
                         <div class="card-buttons" style="padding-bottom: 1.5rem;">
-                            <button
-                                class="btn-secondary"
-                                onclick="openProfilePage('${therapist.profileUrl || 'https://unisonmentalhealth.com/meet-our-team/'}')"
-                                aria-label="View full profile for ${therapist.name}"
-                            >
-                                View Profile
-                            </button>
                             ${generateBookingButton(therapist)}
                         </div>
                     </div>
@@ -1589,24 +1582,92 @@
             return summary.join('') || '<p style="margin: 0; color: #6b7280;">Based on your preferences</p>';
         }
 
-        function handleBookingSubmission(e) {
+        async function handleBookingSubmission(e) {
             e.preventDefault();
 
-            const formData = {
-                fullName: document.getElementById('fullName').value,
-                email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value,
-                selectedTherapist: userBookingData.selectedTherapist,
-                selectedSpecialty: userBookingData.selectedSpecialty,
-                preferences: userBookingData.userResponses,
-                timestamp: new Date().toISOString()
-            };
-
-            // For demo purposes, log the data (replace with actual form submission)
-            console.log('Booking form data:', formData);
-
-            // Show success message
-            showBookingSuccess();
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            
+            // Format preferences for submission
+            const prefsText = formatPreferencesForEmail(userBookingData.userResponses);
+            
+            // Create form data for PHP handler
+            const formData = new FormData();
+            formData.append('Full_Name', fullName);
+            formData.append('Email', email);
+            formData.append('Phone', phone);
+            formData.append('Selected_Therapist', userBookingData.selectedTherapist);
+            formData.append('Selected_Specialty', userBookingData.selectedSpecialty || '');
+            formData.append('Preferences_Summary', prefsText);
+            formData.append('User_Responses', JSON.stringify(userBookingData.userResponses));
+            formData.append('Timestamp', new Date().toISOString());
+            
+            // Disable submit button
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            
+            try {
+                const response = await fetch('/therapair-widget/submit-booking.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    // Redirect to thank you page
+                    window.top.location.href = '/therapair-widget/booking-thank-you.html';
+                } else {
+                    throw new Error('Form submission failed');
+                }
+            } catch (error) {
+                console.error('Booking submission error:', error);
+                alert('Sorry, there was an error submitting your booking. Please try again or contact us directly at tino@unisonmentalhealth.com');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Booking Request';
+            }
+        }
+        
+        function formatPreferencesForEmail(responses) {
+            let parts = [];
+            
+            if (responses.who) {
+                const whoText = responses.who === 'myself' ? 'Therapy for yourself' :
+                               responses.who === 'myself_partner' ? 'Couples therapy' : 'Therapy for someone else';
+                parts.push(whoText);
+            }
+            
+            if (responses.location) {
+                const locationText = responses.location === 'online' ? 'Online sessions' :
+                                   responses.location === 'in_person' ? 'In-person sessions' : 'Either format';
+                parts.push(locationText);
+            }
+            
+            if (responses.concerns && responses.concerns.length > 0) {
+                const concernsMapping = {
+                    "relationship": "Relationship challenges",
+                    "anxiety_depression": "Anxiety or depression",
+                    "trauma": "Trauma or PTSD",
+                    "identity": "Identity exploration",
+                    "sexual_health": "Sexual health concerns",
+                    "psychedelic": "Psychedelic therapy/integration",
+                    "addiction": "Addiction recovery",
+                    "general": "General Support"
+                };
+                const concernsText = responses.concerns
+                    .map(concern => concernsMapping[concern] || concern)
+                    .join(', ');
+                parts.push('Concerns: ' + concernsText);
+            }
+            
+            if (responses.urgency) {
+                const urgencyText = responses.urgency === 'asap' ? 'ASAP' :
+                                  responses.urgency === 'fortnight' ? 'Within 2 weeks' :
+                                  responses.urgency === 'few_weeks' ? 'Within a few weeks' : 'Flexible timeline';
+                parts.push('Timeline: ' + urgencyText);
+            }
+            
+            return parts.join(' | ');
         }
 
         function showBookingSuccess() {

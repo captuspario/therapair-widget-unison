@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmed - Therapair</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
+            background: linear-gradient(135deg, #F8F4FF 0%, #E8DEFF 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            box-shadow: 0 20px 40px rgba(155, 116, 183, 0.25);
+            text-align: center;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-center;
+            margin: 0 auto 2rem;
+        }
+
+        h1 {
+            color: #4F064F;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            color: #64748b;
+            font-size: 1.125rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-box {
+            background: #F8F4FF;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .info-box h3 {
+            color: #4F064F;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .info-box p {
+            color: #374151;
+            font-size: 1rem;
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: #9B74B7;
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-top: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: #4F064F;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(155, 116, 183, 0.25);
+        }
+
+        .contact-info {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .contact-info p {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin: 0.25rem 0;
+        }
+
+        .contact-info a {
+            color: #9B74B7;
+            text-decoration: none;
+        }
+
+        .contact-info a:hover {
+            color: #4F064F;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Success Icon -->
+        <div class="success-icon">
+            <i data-lucide="check" style="width: 48px; height: 48px; color: white;"></i>
+        </div>
+
+        <!-- Main Message -->
+        <h1>Booking Request Received! 🎉</h1>
+        <p>
+            Thanks so much for taking the time to share your preferences with us. 
+            We've received your booking request and sent a confirmation to your email.
+        </p>
+
+        <!-- What Happens Next -->
+        <div class="info-box">
+            <h3>📋 What happens next?</h3>
+            <p>
+                <i data-lucide="mail" style="width: 20px; height: 20px; color: #9B74B7; flex-shrink: 0;"></i>
+                <span>You'll receive a confirmation email shortly (check your spam folder if you don't see it)</span>
+            </p>
+            <p>
+                <i data-lucide="phone" style="width: 20px; height: 20px; color: #9B74B7; flex-shrink: 0;"></i>
+                <span>Our team will contact you within 1 business day to schedule your first session</span>
+            </p>
+            <p>
+                <i data-lucide="calendar" style="width: 20px; height: 20px; color: #9B74B7; flex-shrink: 0;"></i>
+                <span>We'll find a time that works for you and confirm your appointment</span>
+            </p>
+        </div>
+
+        <!-- CTA Buttons -->
+        <a href="https://unisonmentalhealth.com" class="btn">
+            <i data-lucide="home" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 0.5rem;"></i>
+            Return to Unison Mental Health
+        </a>
+
+        <!-- Contact Info -->
+        <div class="contact-info">
+            <p><strong>Questions? Contact us:</strong></p>
+            <p>
+                📧 <a href="mailto:tino@unisonmentalhealth.com">tino@unisonmentalhealth.com</a>
+            </p>
+            <p>
+                📞 <a href="tel:+610480706922">(+61) 0480 706 922</a>
+            </p>
+            <p style="margin-top: 1rem; font-size: 0.75rem;">
+                Powered by <strong>Therapair</strong> for Unison Mental Health
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
+
