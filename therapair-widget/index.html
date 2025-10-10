@@ -265,11 +265,11 @@
         .specialty-tag {
             background-color: #9B74B7;
             color: white;
-            padding: 0.375rem 0.75rem;
+            padding: 0.25rem 0.625rem;
             border-radius: 9999px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 500;
-            margin: 0.25rem 0.25rem 0.25rem 0;
+            margin: 0.2rem 0.2rem 0.2rem 0;
             display: inline-block;
         }
 
@@ -307,7 +307,7 @@
             flex-direction: column;
             min-height: 0;
             overflow: hidden;
-            padding-bottom: 240px;
+            padding-bottom: 180px;
         }
 
         .card-buttons {
@@ -318,8 +318,8 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            padding: 60px 1.5rem 1.5rem 1.5rem;
-            height: 200px;
+            padding: 40px 1.5rem 1.5rem 1.5rem;
+            height: 160px;
             justify-content: flex-end;
         }
 
@@ -1338,18 +1338,13 @@
                             <p style="color: #6b7280; font-size: 0.85rem; line-height: 1.4; margin: 0; min-height: 2.8rem;">${therapist.tagline}</p>
                         </div>
 
-                        <div style="margin-bottom: 1.5rem; flex: 1; display: flex; flex-direction: column; min-height: 140px;">
+                        <div style="margin-bottom: 1.5rem; flex: 1; display: flex; flex-direction: column; min-height: 100px;">
                             <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem; font-weight: 500; margin-top: 0;" id="specialties-${therapist.name.replace(/\s+/g, '-').toLowerCase()}">Specializes in:</p>
                             <div aria-labelledby="specialties-${therapist.name.replace(/\s+/g, '-').toLowerCase()}" style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start;">
-                                <div style="flex-wrap: wrap; display: flex; align-items: flex-start; align-content: flex-start; margin-bottom: 3rem;">
-                                    ${therapist.specialties.slice(0, 3).map(specialty => `
+                                <div style="flex-wrap: wrap; display: flex; align-items: flex-start; align-content: flex-start; margin-bottom: 2rem;">
+                                    ${therapist.specialties.map(specialty => `
                                         <span class="specialty-tag" role="text">${specialty}</span>
                                     `).join('')}
-                                    ${therapist.specialties.length > 3 ? `
-                                        <span style="background-color: #f9fafb; color: #6b7280; border: 1px solid #e5e7eb; padding: 0.375rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; margin: 0.25rem 0.25rem 0.25rem 0; display: inline-block;" role="text">
-                                            +${therapist.specialties.length - 3} more specialties
-                                        </span>
-                                    ` : ''}
                                 </div>
                             </div>
                         </div>
