@@ -7,7 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <!-- Cache bust: 2025-10-10-22:00 -->
+    <!-- Cache bust: 2025-10-10-23:25-SPACING-FIXED-MODAL-SCROLL -->
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -307,7 +307,7 @@
             flex-direction: column;
             min-height: 0;
             overflow: hidden;
-            padding-bottom: 180px;
+            padding-bottom: 100px;
         }
 
         .card-buttons {
@@ -318,8 +318,8 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            padding: 40px 1.5rem 1.5rem 1.5rem;
-            height: 160px;
+            padding: 20px 1.5rem 1.5rem 1.5rem;
+            height: 90px;
             justify-content: flex-end;
         }
 
@@ -1338,14 +1338,12 @@
                             <p style="color: #6b7280; font-size: 0.85rem; line-height: 1.4; margin: 0; min-height: 2.8rem;">${therapist.tagline}</p>
                         </div>
 
-                        <div style="margin-bottom: 1.5rem; flex: 1; display: flex; flex-direction: column; min-height: 100px;">
-                            <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem; font-weight: 500; margin-top: 0;" id="specialties-${therapist.name.replace(/\s+/g, '-').toLowerCase()}">Specializes in:</p>
-                            <div aria-labelledby="specialties-${therapist.name.replace(/\s+/g, '-').toLowerCase()}" style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start;">
-                                <div style="flex-wrap: wrap; display: flex; align-items: flex-start; align-content: flex-start; margin-bottom: 2rem;">
-                                    ${therapist.specialties.map(specialty => `
-                                        <span class="specialty-tag" role="text">${specialty}</span>
-                                    `).join('')}
-                                </div>
+                        <div style="margin-bottom: 1rem; flex: 1; display: flex; flex-direction: column;">
+                            <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 500; margin-top: 0;" id="specialties-${therapist.name.replace(/\s+/g, '-').toLowerCase()}">Specializes in:</p>
+                            <div aria-labelledby="specialties-${therapist.name.replace(/\s+/g, '-').toLowerCase()}" style="display: flex; flex-wrap: wrap; align-items: flex-start; align-content: flex-start;">
+                                ${therapist.specialties.map(specialty => `
+                                    <span class="specialty-tag" role="text">${specialty}</span>
+                                `).join('')}
                             </div>
                         </div>
 
@@ -1438,6 +1436,7 @@
                 z-index: 1000;
                 padding: 20px;
                 box-sizing: border-box;
+                overflow-y: auto;
             `;
 
             // Create modal content
@@ -1451,6 +1450,7 @@
                 max-height: 90vh;
                 overflow-y: auto;
                 box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+                margin: auto 0;
             `;
 
             // Generate summary of user preferences

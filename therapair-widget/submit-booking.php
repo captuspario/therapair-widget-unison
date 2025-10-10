@@ -191,19 +191,20 @@ function formatUserConfirmationEmail($name, $email, $therapist, $preferences) {
                 <p style="font-size: 16px;"><strong>Hi ' . htmlspecialchars($firstName) . ',</strong></p>
                 
                 <p style="font-size: 15px; line-height: 1.8;">
-                    Thanks so much for taking the time to complete the matching experience. We\'re excited to connect you with <strong>' . htmlspecialchars($therapist) . '</strong> who aligns with your preferences and needs.
+                    We\'ve received your booking request.
                 </p>
                 
+                <div class="box" style="background: #e8f5e9;">
+                    <h4 style="margin-top: 0; color: #059669; font-size: 16px;">Your Selection:</h4>
+                    <p style="margin: 8px 0; font-size: 15px;"><strong>Therapist:</strong> ' . htmlspecialchars($therapist) . '</p>
+                    <p style="margin: 0; font-size: 14px; color: #374151;"><strong>Your Preferences:</strong><br>' . htmlspecialchars($preferences) . '</p>
+                </div>
+                
                 <div class="box">
-                    <h3 style="margin-top: 0; color: #4F064F; font-size: 18px;">📋 What happens next?</h3>
+                    <h3 style="margin-top: 0; color: #4F064F; font-size: 18px;">What happens next?</h3>
                     <p style="margin: 8px 0; font-size: 15px;">✓ Our team will review your booking request</p>
                     <p style="margin: 8px 0; font-size: 15px;">✓ We\'ll contact you within <strong>1 business day</strong> to schedule your first session</p>
                     <p style="margin: 8px 0; font-size: 15px;">✓ We\'ll confirm the date, time, and format (online/in-person) that works best for you</p>
-                </div>
-                
-                <div class="box" style="background: #e8f5e9;">
-                    <h4 style="margin-top: 0; color: #059669; font-size: 16px;">Your Preferences:</h4>
-                    <p style="margin: 0; font-size: 14px; color: #374151;">' . htmlspecialchars($preferences) . '</p>
                 </div>
                 
                 <p style="font-size: 15px;">If you have any urgent questions or need to make changes, please don\'t hesitate to reply to this email or call us.</p>
