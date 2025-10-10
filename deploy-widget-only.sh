@@ -75,9 +75,15 @@ echo -e "${YELLOW}📤 Uploading images/ folder...${NC}"
 rsync -avz --delete -e "ssh -p $DEPLOY_PORT" "$LOCAL_WIDGET_DIR/images/" "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/images/"
 echo -e "${GREEN}✅ images/ folder uploaded${NC}"
 
+# Upload PHP files
+echo -e "${YELLOW}📤 Uploading PHP files...${NC}"
+scp -P $DEPLOY_PORT "$LOCAL_WIDGET_DIR/submit-booking.php" "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/"
+scp -P $DEPLOY_PORT "$LOCAL_WIDGET_DIR/booking-thank-you.html" "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/"
+echo -e "${GREEN}✅ PHP files uploaded${NC}"
+
 # Set permissions
 echo -e "${YELLOW}🔧 Setting permissions...${NC}"
-ssh -p $DEPLOY_PORT "$DEPLOY_USER@$DEPLOY_HOST" "chmod 644 $DEPLOY_PATH/index.html && chmod 644 $DEPLOY_PATH/images/*.jpeg 2>/dev/null || true"
+ssh -p $DEPLOY_PORT "$DEPLOY_USER@$DEPLOY_HOST" "chmod 644 $DEPLOY_PATH/index.html $DEPLOY_PATH/submit-booking.php $DEPLOY_PATH/booking-thank-you.html && chmod 644 $DEPLOY_PATH/images/*.jpeg 2>/dev/null || true"
 echo -e "${GREEN}✅ Permissions set${NC}"
 
 # Verify deployment
@@ -91,6 +97,8 @@ echo ""
 echo -e "${BLUE}📋 What was deployed:${NC}"
 echo "  ✅ index.html (updated - removes View Profile buttons)"
 echo "  ✅ images/ folder (all therapist photos)"
+echo "  ✅ submit-booking.php (booking form handler)"
+echo "  ✅ booking-thank-you.html (confirmation page)"
 echo ""
 echo -e "${BLUE}🔗 Test your widget:${NC}"
 echo "  https://unisonmentalhealth.com/find-a-therapist-who-is-right-for-you/"
