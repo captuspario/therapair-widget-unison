@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -26,8 +25,7 @@
         }
 
         /* Iframe widget optimizations */
-        html,
-        body {
+        html, body {
             width: 100%;
             height: auto;
             overflow-x: hidden;
@@ -38,7 +36,6 @@
             body {
                 padding: 0.25rem;
             }
-
             .container {
                 padding: 0;
             }
@@ -59,7 +56,6 @@
                 opacity: 0;
                 transform: translateY(10px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -370,7 +366,6 @@
 
         /* Reduced motion support */
         @media (prefers-reduced-motion: reduce) {
-
             .therapist-card,
             .option-button,
             .btn-primary,
@@ -447,47 +442,15 @@
         }
     </style>
 </head>
-
 <body>
     <div class="container">
-        <!-- Therapair logo header -->
-        <div style="display:flex; justify-content:center; margin-bottom:1rem;">
-            <div style="display:inline-flex; align-items:center; gap:0.5rem;" aria-label="Therapair logo">
-                <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="M12 16 Q18 10, 24 16 T36 16"
-                        stroke="#9B74B7"
-                        stroke-width="3.5"
-                        stroke-linecap="round"
-                        fill="none"
-                    />
-                    <path
-                        d="M36 32 Q30 38, 24 32 T12 32"
-                        stroke="#9B74B7"
-                        stroke-width="3.5"
-                        stroke-linecap="round"
-                        fill="none"
-                    />
-                    <circle cx="24" cy="24" r="2.5" fill="#9B74B7" />
-                    <circle cx="18" cy="16" r="1.8" fill="#9B74B7" opacity="0.6" />
-                    <circle cx="30" cy="32" r="1.8" fill="#9B74B7" opacity="0.6" />
-                </svg>
-                <span
-                    style="
-                        font-family: 'Open Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-                        font-weight: 600;
-                        font-size: 20px;
-                        color: #1E293B;
-                        letter-spacing: -0.02em;
-                    "
-                >
-                    Therapair
-                </span>
-            </div>
-        </div>
         <!-- Start Section -->
         <div class="text-center" style="margin-bottom: 1rem;">
-            <button id="start-btn" onclick="startMatching()" class="btn-primary">
+            <button
+                id="start-btn"
+                onclick="startMatching()"
+                class="btn-primary"
+            >
                 Start Matching
             </button>
         </div>
@@ -535,122 +498,17 @@
             <div class="text-center" style="margin-top: 2rem;">
                 <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 1rem;">Not quite right?</p>
                 <div>
-                    <button onclick="restartQuiz()"
-                        style="color: #9B74B7; text-decoration: underline; background: none; border: none; cursor: pointer; margin-right: 1rem; font-size: 0.875rem;">
+                    <button onclick="restartQuiz()" style="color: #9B74B7; text-decoration: underline; background: none; border: none; cursor: pointer; margin-right: 1rem; font-size: 0.875rem;">
                         Retake quiz
                     </button>
-                    <button
-                        style="color: #9B74B7; text-decoration: underline; background: none; border: none; cursor: pointer; font-size: 0.875rem;">
+                    <button style="color: #9B74B7; text-decoration: underline; background: none; border: none; cursor: pointer; font-size: 0.875rem;">
                         Explore all therapists
                     </button>
                 </div>
             </div>
-    </div>
-
-    </div>
-
-    <!-- Sandbox Feedback Widget -->
-    <div id="sandbox-feedback-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
-        <button id="feedback-toggle-btn" onclick="toggleFeedbackModal()"
-            style="background: #4F064F; color: white; border: none; padding: 12px 20px; border-radius: 30px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; display: flex; align-items: center; gap: 8px;">
-            <span>💬</span> Give Feedback
-        </button>
-
-        <div id="feedback-modal"
-            style="display: none; position: absolute; bottom: 60px; right: 0; width: 280px; max-width: calc(100vw - 2rem); background: white; padding: 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid #e5e7eb;">
-            <h4 style="margin-top: 0; color: #4F064F; margin-bottom: 12px;">Sandbox Feedback</h4>
-            <form id="feedback-form" onsubmit="submitFeedback(event)">
-                <div style="margin-bottom: 12px;">
-                    <label
-                        style="display: block; font-size: 0.875rem; margin-bottom: 4px; color: #374151;">Rating</label>
-                    <div style="display: flex; gap: 8px;">
-                        <button type="button" onclick="setRating(1)" class="rating-btn"
-                            style="flex: 1; padding: 8px; border: 1px solid #d1d5db; background: white; border-radius: 8px; cursor: pointer;">😕</button>
-                        <button type="button" onclick="setRating(3)" class="rating-btn"
-                            style="flex: 1; padding: 8px; border: 1px solid #d1d5db; background: white; border-radius: 8px; cursor: pointer;">😐</button>
-                        <button type="button" onclick="setRating(5)" class="rating-btn"
-                            style="flex: 1; padding: 8px; border: 1px solid #d1d5db; background: white; border-radius: 8px; cursor: pointer;">🤩</button>
-                    </div>
-                    <input type="hidden" id="feedback-rating" name="rating" required>
-                </div>
-
-                <div style="margin-bottom: 12px;">
-                    <label
-                        style="display: block; font-size: 0.875rem; margin-bottom: 4px; color: #374151;">Comments</label>
-                    <textarea id="feedback-text" name="feedback" rows="3"
-                        style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 8px; font-family: inherit;"
-                        placeholder="What do you think?"></textarea>
-                </div>
-
-                <button type="submit"
-                    style="width: 100%; background: #9B74B7; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer;">Submit
-                    Feedback</button>
-            </form>
-            <div id="feedback-success" style="display: none; text-align: center; color: #059669; padding: 20px 0;">
-                <p>Thanks for your feedback! 🎉</p>
-            </div>
         </div>
+
     </div>
-
-    <script>
-        function toggleFeedbackModal() {
-            const modal = document.getElementById('feedback-modal');
-            modal.style.display = modal.style.display === 'none' ? 'block' : 'none';
-        }
-
-        function setRating(val) {
-            document.getElementById('feedback-rating').value = val;
-            document.querySelectorAll('.rating-btn').forEach(btn => {
-                btn.style.borderColor = '#d1d5db';
-                btn.style.background = 'white';
-            });
-            event.target.style.borderColor = '#9B74B7';
-            event.target.style.background = '#F8F4FF';
-        }
-
-        async function submitFeedback(e) {
-            e.preventDefault();
-            const form = e.target;
-            const formData = new FormData(form);
-            const btn = form.querySelector('button[type="submit"]');
-
-            if (!formData.get('rating')) {
-                alert('Please select a rating');
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerText = 'Sending...';
-
-            try {
-                const response = await fetch('submit-feedback.php', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    form.style.display = 'none';
-                    document.getElementById('feedback-success').style.display = 'block';
-                    setTimeout(() => {
-                        toggleFeedbackModal();
-                        // Reset form
-                        form.reset();
-                        form.style.display = 'block';
-                        document.getElementById('feedback-success').style.display = 'none';
-                        btn.disabled = false;
-                        btn.innerText = 'Submit Feedback';
-                    }, 3000);
-                } else {
-                    throw new Error('Failed to submit');
-                }
-            } catch (err) {
-                console.error(err);
-                alert('Something went wrong. Please try again.');
-                btn.disabled = false;
-                btn.innerText = 'Submit Feedback';
-            }
-        }
-    </script>
 
     <script>
         // Image paths for local/standalone use
@@ -699,10 +557,10 @@
                 name: "Nicki Nelis",
                 gender: "female",
                 image: getImagePath("nicki.jpg"),
-                tagline: "Gestalt therapist with nearly 20 years' experience, specializing in LGBTQI+, trauma survivors, and kink communities",
-                specialties: ["LGBTQI+ affirming", "Trauma survivors", "Kink community", "Sexual assault survivors", "Gestalt Therapy", "Psychodynamic Therapy"],
+                tagline: "Gestalt therapist with nearly 20 years' experience, specializing in LGBTQI+, trauma survivors, and kink/ENM communities",
+                specialties: ["LGBTQI+ affirming", "Trauma survivors", "Kink community", "ENM relationships", "Sexual assault survivors", "Gestalt Therapy", "Psychodynamic Therapy"],
                 availability: "In-person Windsor (Thursdays 10am–7pm)",
-                tags: ["lgbtq", "trauma", "kink", "identity", "gestalt", "psychodynamic", "sexual_health", "addiction", "disability"],
+                tags: ["lgbtq", "trauma", "kink", "enm", "identity", "gestalt", "psychodynamic", "sexual_health", "addiction", "disability"],
                 accepting: true,
                 whoSupported: ["myself", "someone_else"],
                 ageGroups: ["adult", "under_18", "mixed"],
@@ -1225,7 +1083,7 @@
                 if (responses.concerns) {
                     const concernsArray = Array.isArray(responses.concerns) ? responses.concerns : [responses.concerns];
                     concernsArray.forEach(concern => {
-                        switch (concern) {
+                        switch(concern) {
                             case 'relationship':
                                 if (therapist.tags.includes('relationship')) score += 3;
                                 break;
@@ -1555,7 +1413,7 @@
             userBookingData.selectedTherapist = therapist.name;
             userBookingData.selectedSpecialty = therapist.specialties[0];
             userBookingData.therapistData = therapist;
-            userBookingData.userResponses = { ...responses };
+            userBookingData.userResponses = {...responses};
 
             // Create and show the booking form
             createBookingForm();
@@ -1614,10 +1472,10 @@
                         <p style="color: #6b7280; margin: 0 0 0.5rem 0; font-size: 0.875rem;">${userBookingData.therapistData.tagline}</p>
                         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                             ${userBookingData.therapistData.specialties.slice(0, 4).map(specialty =>
-                `<span style="background: #9B74B7; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem; font-weight: 500;">${specialty}</span>`
-            ).join('')}
+                                `<span style="background: #9B74B7; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem; font-weight: 500;">${specialty}</span>`
+                            ).join('')}
                             ${userBookingData.therapistData.specialties.length > 4 ?
-                    `<span style="background: #f3f4f6; color: #6b7280; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem; font-weight: 500;">+${userBookingData.therapistData.specialties.length - 4} more</span>` : ''}
+                                `<span style="background: #f3f4f6; color: #6b7280; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem; font-weight: 500;">+${userBookingData.therapistData.specialties.length - 4} more</span>` : ''}
                         </div>
                     </div>
                 </div>
@@ -1671,7 +1529,7 @@
             document.getElementById('booking-form').addEventListener('submit', handleBookingSubmission);
 
             // Close modal when clicking overlay
-            overlay.addEventListener('click', function (e) {
+            overlay.addEventListener('click', function(e) {
                 if (e.target === overlay) {
                     closeBookingForm();
                 }
@@ -1686,13 +1544,13 @@
 
             if (userBookingData.userResponses.who) {
                 const whoText = userBookingData.userResponses.who === 'myself' ? 'therapy for yourself' :
-                    userBookingData.userResponses.who === 'myself_partner' ? 'couples therapy' : 'therapy for someone else';
+                               userBookingData.userResponses.who === 'myself_partner' ? 'couples therapy' : 'therapy for someone else';
                 summary.push(`<p style="margin: 0.5rem 0; color: #374151;"><strong>Seeking:</strong> ${whoText}</p>`);
             }
 
             if (userBookingData.userResponses.location) {
                 const locationText = userBookingData.userResponses.location === 'online' ? 'Online sessions' :
-                    userBookingData.userResponses.location === 'in_person' ? 'In-person sessions' : 'Either online or in-person';
+                                   userBookingData.userResponses.location === 'in_person' ? 'In-person sessions' : 'Either online or in-person';
                 summary.push(`<p style="margin: 0.5rem 0; color: #374151;"><strong>Format:</strong> ${locationText}</p>`);
             }
 
@@ -1715,8 +1573,8 @@
 
             if (userBookingData.userResponses.urgency) {
                 const urgencyText = userBookingData.userResponses.urgency === 'asap' ? 'As soon as possible' :
-                    userBookingData.userResponses.urgency === 'fortnight' ? 'Within 2 weeks' :
-                        userBookingData.userResponses.urgency === 'few_weeks' ? 'Within a few weeks' : 'Willing to wait for the right therapist';
+                                  userBookingData.userResponses.urgency === 'fortnight' ? 'Within 2 weeks' :
+                                  userBookingData.userResponses.urgency === 'few_weeks' ? 'Within a few weeks' : 'Willing to wait for the right therapist';
                 summary.push(`<p style="margin: 0.5rem 0; color: #374151;"><strong>Timeline:</strong> ${urgencyText}</p>`);
             }
 
@@ -1729,10 +1587,10 @@
             const fullName = document.getElementById('fullName').value;
             const email = document.getElementById('email').value;
             const phone = document.getElementById('phone').value;
-
+            
             // Format preferences for submission
             const prefsText = formatPreferencesForEmail(userBookingData.userResponses);
-
+            
             // Create form data for PHP handler
             const formData = new FormData();
             formData.append('Full_Name', fullName);
@@ -1743,18 +1601,18 @@
             formData.append('Preferences_Summary', prefsText);
             formData.append('User_Responses', JSON.stringify(userBookingData.userResponses));
             formData.append('Timestamp', new Date().toISOString());
-
+            
             // Disable submit button
             const submitBtn = e.target.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Sending...';
-
+            
             try {
                 const response = await fetch('/therapair-widget/submit-booking.php', {
                     method: 'POST',
                     body: formData
                 });
-
+                
                 if (response.ok) {
                     // Redirect to thank you page
                     window.top.location.href = '/therapair-widget/booking-thank-you.html';
@@ -1763,27 +1621,27 @@
                 }
             } catch (error) {
                 console.error('Booking submission error:', error);
-                alert('Sorry, there was an error submitting your booking. Please try again or contact us directly at contact@unisonmentalhealth.com');
+                alert('Sorry, there was an error submitting your booking. Please try again or contact us directly at tino@unisonmentalhealth.com');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Send Booking Request';
             }
         }
-
+        
         function formatPreferencesForEmail(responses) {
             let parts = [];
-
+            
             if (responses.who) {
                 const whoText = responses.who === 'myself' ? 'Therapy for yourself' :
-                    responses.who === 'myself_partner' ? 'Couples therapy' : 'Therapy for someone else';
+                               responses.who === 'myself_partner' ? 'Couples therapy' : 'Therapy for someone else';
                 parts.push(whoText);
             }
-
+            
             if (responses.location) {
                 const locationText = responses.location === 'online' ? 'Online sessions' :
-                    responses.location === 'in_person' ? 'In-person sessions' : 'Either format';
+                                   responses.location === 'in_person' ? 'In-person sessions' : 'Either format';
                 parts.push(locationText);
             }
-
+            
             if (responses.concerns && responses.concerns.length > 0) {
                 const concernsMapping = {
                     "relationship": "Relationship challenges",
@@ -1800,14 +1658,14 @@
                     .join(', ');
                 parts.push('Concerns: ' + concernsText);
             }
-
+            
             if (responses.urgency) {
                 const urgencyText = responses.urgency === 'asap' ? 'ASAP' :
-                    responses.urgency === 'fortnight' ? 'Within 2 weeks' :
-                        responses.urgency === 'few_weeks' ? 'Within a few weeks' : 'Flexible timeline';
+                                  responses.urgency === 'fortnight' ? 'Within 2 weeks' :
+                                  responses.urgency === 'few_weeks' ? 'Within a few weeks' : 'Flexible timeline';
                 parts.push('Timeline: ' + urgencyText);
             }
-
+            
             return parts.join(' | ');
         }
 
@@ -1839,5 +1697,4 @@
         }
     </script>
 </body>
-
 </html>
